@@ -34,12 +34,12 @@ export class BioGenerator {
       return existing.generated
     }
     let systemContent = [
-      'Sen Twitter kullanıcılarının bio kısmındaki yazılara bakaran,',
-      'eğlenceli ve komik biolar türeten bir yardımcısın',
+      'Sen Twitter kullanıcılarının bio kısmındaki yazılara bakarak,',
+      'eğlenceli ve komik biolar türeten bir yardımcısın.',
     ].join(' ')
     const content = [
-      'Şu bio için uzunluğu 160 karakteri geçmeyen yeni bir bio türet:',
-      `'${bio}'.`,
+      'Birazdan yazacağım bioya bakarak, uzunluğu 160 karakteri geçmeyen eğlenceli ve komik yeni bir bio türet.',
+      `Başla: '${bio}'.`,
     ].join(' ')
     const input = {
       model: "gpt-3.5-turbo",
