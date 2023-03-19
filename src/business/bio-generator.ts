@@ -34,11 +34,11 @@ export class BioGenerator {
       return existing.generated
     }
     let systemContent = [
-      'Sen Twitter kullanıcılarının bio kısmındaki yazılara bakarak,',
-      'eğlenceli ve komik biolar türeten bir yardımcısın.',
+      'Sen insanların kendilerini tanıttıkları yazılara bakarak,',
+      'eğlenceli ve komik yeni yazılar türeten bir yardımcısın.',
     ].join(' ')
     const content = [
-      'Birazdan yazacağım bioya bakarak, uzunluğu 160 karakteri geçmeyen eğlenceli ve komik yeni bir bio türet.',
+      'Birazdan yazacağım tanıtım yazısına bakarak, uzunluğu 160 karakteri geçmeyen eğlenceli ve komik yeni bir tanıtım yazısı türet.',
       `Başla: '${bio}'.`,
     ].join(' ')
     const input = {
@@ -48,10 +48,13 @@ export class BioGenerator {
         {role: "user", content}
       ]
     } as any
+    console.log(JSON.stringify(input, null, 2))
 
     const response = await this.openai.createChatCompletion(input)
-    
     const generated = response.data.choices[0].message?.content || ''
+
+    console.log('Generated response: ' + generated)
+    
     await this.s3Client.send(new PutObjectCommand({
       Body: JSON.stringify({
         original: bio,

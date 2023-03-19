@@ -12,7 +12,10 @@ export class Twitter {
   ) {}
 
   async bio(): Promise<string> {
-    const user = await this.twitterApi.currentUserV2()
+    const user = await this.twitterApi.v2.me({
+      "user.fields": 'description',
+    })
+    console.log(JSON.stringify(user, null, 2))
     return user.data?.description || ''
   }
 }

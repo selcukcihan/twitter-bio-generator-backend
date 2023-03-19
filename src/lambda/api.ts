@@ -10,9 +10,6 @@ import { Configuration, OpenAIApi } from 'openai'
 
 Container.set('S3_CLIENT', new S3Client({ region: 'eu-west-1' }))
 Container.set('S3_BUCKET', process.env.BUCKET)
-Container.set('OPEN_AI_CLIENT', new OpenAIApi(new Configuration({
-  apiKey: process.env.OPENAI_API_KEY as string,
-})))
 
 async function handler(event: any, context: any) {
   console.log(`Started processing...\nPayload: ${JSON.stringify({ event, context }, null, 2)}`)
@@ -25,6 +22,9 @@ async function handler(event: any, context: any) {
     appSecret: process.env.TWITTER_CONSUMER_SECRET as string,
     ...tokens,
   }))
+  Container.set('OPEN_AI_CLIENT', new OpenAIApi(new Configuration({
+    apiKey: process.env.OPENAI_API_KEY as string,
+  })))
 
   const bioGenerator = Container.get(BioGenerator)
   const response = await bioGenerator.generate(twitterUserId)
