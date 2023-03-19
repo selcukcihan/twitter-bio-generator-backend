@@ -33,16 +33,20 @@ export class BioGenerator {
     if (existing && existing.original === bio) {
       return existing.generated
     }
-
+    let systemContent = [
+      'Sen Twitter kullanıcılarının bio kısmındaki yazılara bakaran,',
+      'eğlenceli ve komik biolar türeten bir yardımcısın',
+    ].join(' ')
     const content = [
-      'Twitter kullanıcılarının bio kısmına yazdığı yazıları alıp,',
-      'onlar için daha komik ve ilgi çekici hale getir.',
-      'Yazdığın bio 160 karakteri geçmesin.',
-      `Başlıyorum, '${bio}'.`,
+      'Şu bio için uzunluğu 160 karakteri geçmeyen yeni bir bio türet:',
+      `'${bio}'.`,
     ].join(' ')
     const input = {
       model: "gpt-3.5-turbo",
-      messages: [{role: "user", content}]
+      messages: [
+        {role: "system", content: systemContent},
+        {role: "user", content}
+      ]
     } as any
 
     const response = await this.openai.createChatCompletion(input)
