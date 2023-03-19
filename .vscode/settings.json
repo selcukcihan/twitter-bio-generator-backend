@@ -1,0 +1,8 @@
+{
+  "files.exclude": {
+    "**/.git": true,
+    "node_modules": true,
+    ".serverless": true,
+    ".env": true
+  }
+}

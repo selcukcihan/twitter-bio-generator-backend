@@ -1,0 +1,89 @@
+service: twitter-bio-generator-backend
+frameworkVersion: '3'
+useDotenv: true
+
+plugins:
+  - serverless-esbuild
+
+provider:
+  name: aws
+  stage: dev
+  region: eu-west-1
+  profile: kendi-hesabim
+  tracing:
+    lambda: true
+  
+  runtime: nodejs18.x
+  memorySize: 512
+  timeout: 10
+  logRetentionInDays: 60
+
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - 's3:*'
+          Resource: '*'
+
+  httpApi:
+    authorizers:
+      jwt:
+        type: jwt
+        identitySource: $request.header.Authorization
+        issuerUrl: https://dev-ukwn2fwyghycs35o.us.auth0.com/
+        audience: twitter-bio-generator-backend
+    cors:
+      allowedOrigins:
+        - https://twitter-bio-generator.selcukcihan.com	
+      allowedHeaders:
+        - Content-Type
+        - Authorization
+      allowedMethods:
+        - GET
+        - OPTIONS
+      allowCredentials: true
+      maxAge: 3600
+package:
+  individually: true
+
+custom:
+  esbuild:
+    bundle: true
+    minify: false
+    sourcemap: true
+    exclude:
+        - aws-sdk
+    platform: 'node'
+    concurrency: 10
+    plugins: ./esbuild-plugins.js
+
+resources:
+  Resources:
+    bioBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: cihan-twitter-bio-generator-backend-bucket
+
+functions:
+  api:
+    handler: src/lambda/api.handler
+    timeout: 28
+    events:
+      - httpApi:
+          method: GET
+          path: /bio
+          authorizer:
+            name: jwt
+    environment:
+      BUCKET: ${self:resources.Resources.bioBucket.Properties.BucketName}
+      AUTH0_ADMIN_AUDIENCE: https://dev-ukwn2fwyghycs35o.us.auth0.com/api/v2/
+      AUTH0_ADMIN_CLIENT_SECRET: ${env:AUTH0_ADMIN_CLIENT_SECRET}
+      AUTH0_ADMIN_CLIENT_ID: ${env:AUTH0_ADMIN_CLIENT_ID}
+      AUTH0_TOKEN_URL: https://dev-ukwn2fwyghycs35o.us.auth0.com/oauth/token
+      AUTH0_ADMIN_GET_USER_URL: https://dev-ukwn2fwyghycs35o.us.auth0.com/api/v2/users/
+      TWITTER_CONSUMER_KEY: ${env:TWITTER_CONSUMER_KEY}
+      TWITTER_CONSUMER_SECRET: ${env:TWITTER_CONSUMER_SECRET}
+      OPENAI_API_KEY: ${env:OPENAI_API_KEY}
+      AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1'
+      NODE_OPTIONS: '--enable-source-maps'
