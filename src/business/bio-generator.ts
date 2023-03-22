@@ -1,12 +1,7 @@
 import { Inject, Service } from 'typedi'
 import { Twitter } from './twitter'
-import { PutObjectCommand, GetObjectCommand, S3Client } from '@aws-sdk/client-s3'
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
 import { OpenAIApi } from 'openai'
-
-interface GeneratedBio {
-  original: string
-  generated: string
-}
 
 @Service()
 export class BioGenerator {
@@ -19,20 +14,6 @@ export class BioGenerator {
 
   async generate(twitterUserId: string) {
     const bio = await this.twitter.bio()
-    let existing: GeneratedBio | null = null
-    try {
-      const response = await this.s3Client.send(new GetObjectCommand({
-        Key: `user/${twitterUserId}/bio.json`,
-        Bucket: this.s3Bucket,
-      }))
-      existing = JSON.parse((await response.Body?.transformToString()) || '') as GeneratedBio
-    } catch (error) {
-
-    }
-
-    if (existing && existing.original === bio) {
-      return existing.generated
-    }
     let systemContent = [
       'Sen insanların kendilerini tanıttıkları yazılara bakarak,',
       'eğlenceli ve komik yeni yazılar türeten bir yardımcısın.',
